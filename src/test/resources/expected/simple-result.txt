@@ -1,0 +1,12 @@
+==================================================
+UserController.createUser()
+==================================================
+
+UserController.createUser()
+├─ UserService.validate()
+│  └─ UserRepository.findByEmail()
+└─ UserService.createUser()
+   ├─ UserRepository.save()
+   ├─ HistoryService.saveHistory()
+   │  └─ HistoryRepository.save()
+   └─ unsupported: externalClient.send()
