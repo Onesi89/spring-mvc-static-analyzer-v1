@@ -37,4 +37,17 @@ class SourceParserTest {
                 .extracting(AnalysisWarning::code)
                 .isEqualTo("parse-error");
     }
+
+    @Test
+    void recordsWarningForUnreadableSourceAndContinues() {
+        Path missingSource = tempDir.resolve("Missing.java");
+        List<AnalysisWarning> warnings = new ArrayList<>();
+
+        List<ParsedSource> parsed = new SourceParser().parse(List.of(missingSource), warnings);
+
+        assertThat(parsed).isEmpty();
+        assertThat(warnings).singleElement()
+                .extracting(AnalysisWarning::code)
+                .isEqualTo("read-error");
+    }
 }

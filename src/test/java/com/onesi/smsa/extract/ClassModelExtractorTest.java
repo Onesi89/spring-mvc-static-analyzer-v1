@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.javaparser.StaticJavaParser;
 import com.onesi.smsa.model.ClassInfo;
+import com.onesi.smsa.model.ConstructorInfo;
+import com.onesi.smsa.model.FieldInfo;
 import com.onesi.smsa.model.Layer;
+import com.onesi.smsa.model.MethodInfo;
 import com.onesi.smsa.parser.ParsedSource;
 import java.nio.file.Path;
 import java.util.List;
@@ -46,10 +49,34 @@ class ClassModelExtractorTest {
         assertThat(controller.qualifiedName()).isEqualTo("demo.UserController");
         assertThat(controller.layer()).isEqualTo(Layer.CONTROLLER);
         assertThat(controller.annotations()).containsExactly("Controller");
-        assertThat(controller.fields()).extracting("name").containsExactly("userService");
-        assertThat(controller.fields().get(0).annotations()).containsExactly("Autowired");
-        assertThat(controller.constructors()).extracting("parameterType").containsExactly("HistoryService");
-        assertThat(controller.methods()).extracting(method -> method.ref().methodName()).contains("createUser", "helper");
-        assertThat(controller.methods()).allSatisfy(method -> assertThat(method.rawCalls()).isEmpty());
+
+        assertThat(controller.fields()).hasSize(1);
+        FieldInfo field = controller.fields().get(0);
+        assertThat(field.name()).isEqualTo("userService");
+        assertThat(field.typeName()).isEqualTo("UserService");
+        assertThat(field.annotations()).containsExactly("Autowired");
+
+        assertThat(controller.constructors()).hasSize(1);
+        ConstructorInfo constructor = controller.constructors().get(0);
+        assertThat(constructor.parameterName()).isEqualTo("historyService");
+        assertThat(constructor.parameterType()).isEqualTo("HistoryService");
+
+        MethodInfo createUser = controller.methods().stream()
+                .filter(method -> method.ref().methodName().equals("createUser"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(createUser.ref().className()).isEqualTo("UserController");
+        assertThat(createUser.ref().methodName()).isEqualTo("createUser");
+        assertThat(createUser.publicMethod()).isTrue();
+        assertThat(createUser.rawCalls()).isEmpty();
+
+        MethodInfo helper = controller.methods().stream()
+                .filter(method -> method.ref().methodName().equals("helper"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(helper.ref().className()).isEqualTo("UserController");
+        assertThat(helper.ref().methodName()).isEqualTo("helper");
+        assertThat(helper.publicMethod()).isFalse();
+        assertThat(helper.rawCalls()).isEmpty();
     }
 }
