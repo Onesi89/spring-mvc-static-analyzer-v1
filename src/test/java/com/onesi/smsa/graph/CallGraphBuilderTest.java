@@ -1,6 +1,7 @@
 package com.onesi.smsa.graph;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -9,6 +10,7 @@ import com.onesi.smsa.model.ClassInfo;
 import com.onesi.smsa.model.Layer;
 import com.onesi.smsa.model.MethodInfo;
 import com.onesi.smsa.model.MethodRef;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +22,20 @@ class CallGraphBuilderTest {
         CallGraph graph = new CallGraph(Map.of());
 
         assertThat(graph.outgoing(new MethodRef("UserService", "missing"))).isEmpty();
+    }
+
+    @Test
+    void copiesAndProtectsOutgoingEdges() {
+        MethodRef source = new MethodRef("UserService", "createUser");
+        MethodRef target = new MethodRef("UserRepository", "save");
+        List<CallEdge> originalEdges = new ArrayList<>(List.of(CallEdge.resolved(target)));
+
+        CallGraph graph = new CallGraph(Map.of(source, originalEdges));
+        originalEdges.clear();
+
+        assertThat(graph.outgoing(source)).containsExactly(CallEdge.resolved(target));
+        assertThatThrownBy(() -> graph.outgoing(source).clear())
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
