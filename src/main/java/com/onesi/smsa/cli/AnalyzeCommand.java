@@ -13,7 +13,7 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "analyze", mixinStandardHelpOptions = true, description = "Analyze Spring MVC call flows.")
 public class AnalyzeCommand implements Callable<Integer> {
-    @Parameters(index = "0", description = "Target Spring MVC project path")
+    @Parameters(index = "0", arity = "0..1", description = "Target Spring MVC project path")
     private Path targetPath;
 
     @Option(names = {"-o", "--output"}, defaultValue = "result.txt", description = "Output report path")
@@ -22,6 +22,11 @@ public class AnalyzeCommand implements Callable<Integer> {
     @Override
     public Integer call() {
         try {
+            if (targetPath == null) {
+                System.err.println("ERROR: Input path is required.");
+                return 1;
+            }
+
             if (!Files.exists(targetPath) || !Files.isDirectory(targetPath)) {
                 System.err.println("ERROR: Input path must be an existing directory: " + targetPath);
                 return 1;

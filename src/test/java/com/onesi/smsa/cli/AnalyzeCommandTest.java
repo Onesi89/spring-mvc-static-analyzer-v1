@@ -12,6 +12,13 @@ class AnalyzeCommandTest {
     Path tempDir;
 
     @Test
+    void returnsOneForMissingInputArgument() {
+        int exitCode = new CommandLine(new AnalyzeCommand()).execute();
+
+        assertThat(exitCode).isEqualTo(1);
+    }
+
+    @Test
     void returnsOneForMissingInputPath() {
         int exitCode = new CommandLine(new AnalyzeCommand()).execute(tempDir.resolve("missing").toString());
 
