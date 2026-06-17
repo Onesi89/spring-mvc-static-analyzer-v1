@@ -64,8 +64,29 @@ class CallGraphBuilderTest {
                         CallEdge.resolved(new MethodRef("UserController", "validate")),
                         CallEdge.resolved(new MethodRef("UserController", "audit")),
                         CallEdge.resolved(new MethodRef("UserService", "createUser")),
-                        CallEdge.marker("unresolved: userService.missing()"),
-                        CallEdge.marker("unsupported: logger.info()"));
+                        CallEdge.marker("unresolved: userService.missing()"));
+    }
+
+    @Test
+    void ignoresUnsupportedControllerCallsThatDoNotLeadToApplicationLayers() {
+        ClassInfo controller = classInfo("CallableController", Layer.CONTROLLER, List.of(
+                method("CallableController", "callableWithView", """
+                        public void callableWithView(Model model) {
+                            Thread.sleep(2000);
+                            model.addAttribute("foo", "bar");
+                            logger.info("done");
+                            userService.createUser();
+                        }
+                        """)));
+        ClassInfo service = classInfo("UserService", Layer.SERVICE, List.of(
+                method("UserService", "createUser", "public void createUser() {}")));
+
+        CallGraph graph = new CallGraphBuilder(new MethodCallExtractor()).build(
+                List.of(controller, service),
+                Map.of("CallableController", Map.of("userService", "UserService")));
+
+        assertThat(graph.outgoing(new MethodRef("CallableController", "callableWithView")))
+                .containsExactly(CallEdge.resolved(new MethodRef("UserService", "createUser")));
     }
 
     private static ClassInfo classInfo(String simpleName, Layer layer, List<MethodInfo> methods) {
