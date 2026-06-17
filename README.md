@@ -13,6 +13,8 @@ Spring MVC Static Analyzer 1 is a Java CLI tool that statically analyzes legacy 
 ./gradlew run --args="/path/to/legacy-project -o result.txt"
 ```
 
+For detailed usage, see [docs/usage.md](docs/usage.md).
+
 ## Supported MVP Scope
 
 - Java 8 or later source code
