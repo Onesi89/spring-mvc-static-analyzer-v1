@@ -4,7 +4,11 @@
 
 ## 1. 준비 사항
 
-필요한 환경:
+GitHub Actions에서 제공하는 runtime 포함 Windows ZIP을 사용하는 경우:
+
+- 별도 Java 설치가 필요하지 않습니다.
+
+소스에서 직접 실행하거나 테스트하는 경우:
 
 - Java 17
 - 인터넷 연결
@@ -47,9 +51,25 @@ Windows 경로를 전달할 때는 따옴표로 감싸는 것을 권장합니다
 
 ## 4. GitHub Actions Windows ZIP 사용
 
-GitHub Actions의 `Build` workflow가 성공하면 `spring-mvc-static-analyzer-windows-bat-zip` artifact를 내려받을 수 있습니다.
+GitHub Actions의 `Build` workflow가 성공하면 Windows용 artifact를 내려받을 수 있습니다.
 
-ZIP 파일을 압축 해제한 뒤 Windows 터미널에서 `.bat` 실행 파일을 사용합니다.
+권장 artifact:
+
+- `spring-mvc-static-analyzer-windows-runtime-zip`
+- Java runtime을 포함합니다.
+- 사용자 PC에 Java를 따로 설치하지 않아도 됩니다.
+
+ZIP 파일을 압축 해제한 뒤 Windows 터미널에서 `.exe` 실행 파일을 사용합니다.
+
+```bat
+spring-mvc-static-analyzer-v1.exe C:\workspace\legacy-project -o result.txt
+```
+
+기존 artifact:
+
+- `spring-mvc-static-analyzer-windows-bat-zip`
+- Java runtime을 포함하지 않습니다.
+- 사용자 PC에 Java 17이 설치되어 있어야 합니다.
 
 ```bat
 bin\spring-mvc-static-analyzer-v1.bat C:\workspace\legacy-project -o result.txt

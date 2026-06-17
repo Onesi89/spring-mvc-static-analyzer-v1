@@ -3,8 +3,15 @@ plugins {
     id 'application'
 }
 
+import java.util.Locale
+
 group = 'com.onesi'
 version = '0.1.0'
+
+def appName = 'spring-mvc-static-analyzer-v1'
+def isWindows = providers.systemProperty('os.name')
+    .map { it.toLowerCase(Locale.ROOT).contains('windows') }
+    .get()
 
 java {
     toolchain {
@@ -14,6 +21,7 @@ java {
 
 application {
     mainClass = 'com.onesi.smsa.Main'
+    applicationName = appName
 }
 
 dependencies {
@@ -35,4 +43,45 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
+}
+
+tasks.register('windowsRuntimeImage', Exec) {
+    group = 'distribution'
+    description = 'Builds a Windows application image with a bundled Java runtime using jpackage.'
+    dependsOn tasks.named('installDist')
+
+    def imageOutputDir = layout.buildDirectory.dir('jpackage').get().asFile
+    def inputDir = layout.buildDirectory.dir("install/${appName}/lib").get().asFile
+    def mainJar = "${appName}-${project.version}.jar"
+
+    doFirst {
+        if (!isWindows) {
+            throw new GradleException('windowsRuntimeImage must be run on Windows because jpackage creates a Windows executable and runtime image.')
+        }
+        delete imageOutputDir
+    }
+
+    executable = 'jpackage'
+    args = [
+        '--type', 'app-image',
+        '--name', appName,
+        '--input', inputDir.absolutePath,
+        '--main-jar', mainJar,
+        '--main-class', application.mainClass.get(),
+        '--dest', imageOutputDir.absolutePath,
+        '--app-version', project.version.toString()
+    ]
+}
+
+tasks.register('windowsRuntimeZip', Zip) {
+    group = 'distribution'
+    description = 'Packages the Windows application image, including Java runtime, as a ZIP file.'
+    dependsOn tasks.named('windowsRuntimeImage')
+
+    archiveFileName = "${appName}-${project.version}-windows-runtime.zip"
+    destinationDirectory = layout.buildDirectory.dir('distributions')
+
+    from(layout.buildDirectory.dir("jpackage/${appName}")) {
+        into("${appName}-${project.version}-windows-runtime")
+    }
 }
