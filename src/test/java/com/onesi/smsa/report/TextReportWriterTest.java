@@ -43,6 +43,7 @@ class TextReportWriterTest {
                 └─ AuditService.recordAccess()
                    └─ AuditRepository.save()
                 """.stripTrailing());
+        assertThat(report).doesNotContain("\r\n");
         assertThat(report).doesNotContain("Warnings");
     }
 }

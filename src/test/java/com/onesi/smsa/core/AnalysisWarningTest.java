@@ -16,5 +16,6 @@ class AnalysisWarningTest {
         assertThat(warning.format()).isEqualTo("""
                 [parse-error] src/main/java/Broken.java
                   Could not parse Java source.""".stripTrailing());
+        assertThat(warning.format()).doesNotContain("\r\n");
     }
 }
