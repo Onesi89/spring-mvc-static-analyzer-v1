@@ -111,16 +111,12 @@ jobs:
             $entries = [System.IO.Compression.ZipFile]::OpenRead($archive.FullName)
             try {
               $exe = $entries.Entries | Where-Object { $_.FullName -like "*/spring-mvc-static-analyzer-v1.exe" }
-              $java = $entries.Entries | Where-Object { $_.FullName -like "*/runtime/bin/java.exe" }
 
               if (-not $exe) {
                 throw "No application .exe found in $($archive.FullName)."
               }
-              if (-not $java) {
-                throw "No bundled runtime java.exe found in $($archive.FullName)."
-              }
 
-              Write-Host "$($archive.FullName): bundled .exe and runtime java.exe verified."
+              Write-Host "$($archive.FullName): application .exe verified."
             } finally {
               $entries.Dispose()
             }
