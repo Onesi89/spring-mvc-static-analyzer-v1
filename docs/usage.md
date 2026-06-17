@@ -45,7 +45,19 @@ Windows 경로를 전달할 때는 따옴표로 감싸는 것을 권장합니다
 ./gradlew run --args="/path/to/legacy-project"
 ```
 
-## 4. 결과 예시
+## 4. GitHub Actions Windows ZIP 사용
+
+GitHub Actions의 `Build` workflow가 성공하면 `spring-mvc-static-analyzer-windows-bat-zip` artifact를 내려받을 수 있습니다.
+
+ZIP 파일을 압축 해제한 뒤 Windows 터미널에서 `.bat` 실행 파일을 사용합니다.
+
+```bat
+bin\spring-mvc-static-analyzer-v1.bat C:\workspace\legacy-project -o result.txt
+```
+
+같은 workflow는 테스트 fixture로 생성한 `spring-mvc-static-analyzer-sample-result` artifact도 함께 업로드합니다.
+
+## 5. 결과 예시
 
 출력 파일은 UTF-8 텍스트 파일입니다.
 
@@ -71,7 +83,7 @@ UserController.createUser()
 - `UserRepository`, `HistoryRepository` 호출까지 이어지는 흐름을 보여줍니다.
 - `unsupported: externalClient.send()`는 MVP 범위에서 해석할 수 없는 외부 또는 미지원 호출입니다.
 
-## 5. 지원 범위
+## 6. 지원 범위
 
 MVP에서 지원하는 패턴:
 
@@ -86,7 +98,7 @@ MVP에서 지원하는 패턴:
 - Controller의 public 메서드 시작점
 - Controller -> Service -> Repository/DAO/Mapper 호출 흐름
 
-## 6. 미지원 범위
+## 7. 미지원 범위
 
 다음은 MVP에서 분석하지 않습니다.
 
@@ -108,7 +120,7 @@ circular: UserService.process()
 unsupported: max call depth exceeded
 ```
 
-## 7. 오류 처리
+## 8. 오류 처리
 
 입력 오류는 exit code `1`을 반환합니다.
 
@@ -131,7 +143,7 @@ Warnings
   Could not parse Java source.
 ```
 
-## 8. 테스트 fixture로 동작 확인
+## 9. 테스트 fixture로 동작 확인
 
 저장소에 포함된 샘플 fixture로 프로그램 동작을 확인할 수 있습니다.
 
@@ -151,7 +163,7 @@ cat build/simple-result.txt
 ./gradlew test
 ```
 
-## 9. IDE에서 demo 파일 오류가 보일 때
+## 10. IDE에서 demo 파일 오류가 보일 때
 
 `src/test/resources/fixtures/simple-spring-mvc/src/main/java/demo` 아래 파일들은 컴파일 대상 소스가 아니라 분석 입력용 fixture입니다.
 

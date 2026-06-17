@@ -1,0 +1,77 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-bat-distribution:
+    name: Windows .bat distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Make Gradle launcher executable
+        run: chmod +x gradlew
+
+      - name: Test and build distribution
+        run: ./gradlew test distZip
+
+      - name: Verify Windows launcher is packaged
+        run: |
+          python3 - <<'PY'
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          distributions = sorted(Path("build/distributions").glob("*.zip"))
+          if not distributions:
+              sys.exit("No distribution ZIP was created.")
+
+          for distribution in distributions:
+              with zipfile.ZipFile(distribution) as archive:
+                  bat_files = [
+                      name for name in archive.namelist()
+                      if name.startswith(distribution.stem + "/bin/")
+                      and name.endswith(".bat")
+                  ]
+              if not bat_files:
+                  sys.exit(f"No Windows .bat launcher found in {distribution}.")
+              print(f"{distribution}: {', '.join(bat_files)}")
+          PY
+
+      - name: Generate sample analysis result
+        run: ./gradlew run --args="src/test/resources/fixtures/simple-spring-mvc -o build/sample-result.txt"
+
+      - name: Upload Windows distribution ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-mvc-static-analyzer-windows-bat-zip
+          path: build/distributions/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload sample analysis result
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-mvc-static-analyzer-sample-result
+          path: build/sample-result.txt
+          if-no-files-found: error
+          retention-days: 30
