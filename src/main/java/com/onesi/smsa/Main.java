@@ -1,14 +1,13 @@
 package com.onesi.smsa;
 
-import com.onesi.smsa.cli.AnalyzeCommand;
-import picocli.CommandLine;
-
 public final class Main {
     private Main() {
     }
 
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new AnalyzeCommand()).execute(args);
-        System.exit(exitCode);
+        int exitCode = new AppLauncher().launch(args);
+        if (args.length > 0) {
+            System.exit(exitCode);
+        }
     }
 }
