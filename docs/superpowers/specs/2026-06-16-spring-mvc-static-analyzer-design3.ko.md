@@ -431,7 +431,7 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 2. `[assumed]` suffix 추가
 3. `unresolved` 유지하되 warning에 Spring Data JPA 가능성 안내
 
-추천:
+결정:
 
 ```text
 UserRepository.findAll()
@@ -442,6 +442,21 @@ UserRepository.findAll()
 - 레거시 흐름 파악에는 repository 호출 사실이 더 중요하다.
 - Spring Data JPA 기본 method는 소스에 안 보이는 것이 정상이다.
 - `unresolved`는 사용자에게 오류처럼 보인다.
+
+적용 방식:
+
+- injected dependency의 대상 class가 Repository/DAO/Mapper 계층이면, 소스에
+  선언되지 않은 method라도 repository 호출로 표시한다.
+- 리포트에는 `[assumed]` 같은 suffix를 붙이지 않는다.
+- 사용자가 읽는 흐름에서는 `UserRepository.findAll()`처럼 출력한다.
+- 내부 정책 class 또는 테스트 이름에는 Spring Data JPA 추정 동작임을 명시한다.
+
+예상 후속 구현:
+
+- `CallResolutionPolicy` 또는 별도 `RepositoryMethodPolicy`에서 repository
+  상속 method 추정 규칙을 다룬다.
+- `CallGraphBuilder`는 정책 결과를 사용하되, Spring Data JPA 전용 조건문을
+  직접 늘리지 않는다.
 
 ### Task 6. 문서 업데이트
 
