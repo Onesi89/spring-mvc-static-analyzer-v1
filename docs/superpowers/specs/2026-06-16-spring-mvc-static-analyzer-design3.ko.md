@@ -327,13 +327,13 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 
 권장 task 단위:
 
-1. `AnalysisRunner` 설계 및 테스트
-2. CLI를 `AnalysisRunner`로 이전
-3. GUI를 `AnalysisRunner`로 이전
-4. Controller noise policy 분리
-5. marker 구조화 필요성 재검토
-6. docs/usage 업데이트
-7. 전체 검증 및 compound
+1. `AnalysisRunner` 설계 및 테스트 - 완료
+2. CLI를 `AnalysisRunner`로 이전 - 완료
+3. GUI를 `AnalysisRunner`로 이전 - 완료
+4. Controller noise policy 분리 - 완료
+5. Spring Data JPA unresolved 정책 검토 - 결정 완료
+6. docs/usage 업데이트 - 완료
+7. 전체 검증 및 compound - 완료
 
 각 task 완료 기준:
 
@@ -366,6 +366,11 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 - Java 파일 없는 directory면 exit code `1`
 - write 실패는 exit code `2`
 
+완료 결과:
+
+- `AnalysisRunner`가 공통 분석 실행과 report write를 담당한다.
+- CLI/GUI가 공유할 수 있는 `AnalysisExecutionResult`를 추가했다.
+
 ### Task 2. CLI를 `AnalysisRunner`로 이전
 
 목표:
@@ -382,6 +387,11 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 
 - 기존 CLI 테스트 통과
 - fixture CLI 실행 결과 동일
+
+완료 결과:
+
+- `AnalyzeCommand`는 직접 `Analyzer`와 `TextReportWriter`를 호출하지 않는다.
+- CLI exit code 의미는 유지된다.
 
 ### Task 3. GUI를 `AnalysisRunner`로 이전
 
@@ -401,6 +411,11 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 - 전체 테스트 통과
 - headless CI에서 UI 창 직접 테스트는 하지 않는다.
 
+완료 결과:
+
+- `AnalyzerGui`는 `AnalysisRunner`를 통해 분석과 결과 파일 저장을 실행한다.
+- GUI는 사용자 입력, 버튼 상태, 실행 로그 표시를 담당한다.
+
 ### Task 4. Controller noise policy 분리
 
 목표:
@@ -417,6 +432,11 @@ Ponytail은 개발 3차 리팩토링의 작업 단위 추적에 사용한다.
 
 - Controller의 `Thread.sleep()`, `model.addAttribute()`는 출력되지 않는다.
 - Service의 `externalClient.send()`는 계속 출력된다.
+
+완료 결과:
+
+- Controller unsupported noise suppression은 `CallResolutionPolicy`로 이동했다.
+- `CallGraphBuilder`는 policy 결과를 사용해 edge suppress 여부를 판단한다.
 
 ### Task 5. Spring Data JPA unresolved 정책 검토
 
@@ -457,6 +477,11 @@ UserRepository.findAll()
   상속 method 추정 규칙을 다룬다.
 - `CallGraphBuilder`는 정책 결과를 사용하되, Spring Data JPA 전용 조건문을
   직접 늘리지 않는다.
+
+완료 결과:
+
+- 개발 3차에서는 구현하지 않고 표시 정책만 결정했다.
+- 구현은 개발 4차 후보로 남긴다.
 
 ### Task 6. 문서 업데이트
 
@@ -540,6 +565,34 @@ CallGraphBuilder를 건드리면 리포트가 바뀔 수 있다.
 - fixture 실행 결과가 기존 핵심 흐름을 유지한다.
 - Windows 배포 workflow에 불필요한 변경이 없다.
 - 리팩토링 과정에서 얻은 교훈이 compound 문서로 남는다.
+
+## 개발 3차 완료 결과
+
+완료된 변경:
+
+- `AnalysisRunner`, `AnalysisRequest`, `AnalysisExecutionResult`를 추가해
+  분석 실행과 txt 파일 저장을 application use case로 분리했다.
+- CLI는 `AnalyzeCommand`에서 `AnalysisRunner`를 호출한다.
+- GUI는 `AnalyzerGui`에서 `AnalysisRunner`를 호출하고, 화면 이벤트와 로그
+  출력에 집중한다.
+- Controller unsupported noise suppression은 `CallResolutionPolicy`로
+  분리했다.
+- Spring Data JPA inherited repository method는 향후 repository 호출 흐름으로
+  표시하기로 결정했다.
+
+검증된 동작:
+
+- 전체 테스트가 통과한다.
+- fixture 실행으로 `UserController.createUser()` 흐름이 생성된다.
+- Service 내부 `unsupported: externalClient.send()`는 계속 출력된다.
+- Controller 내부 `Thread.sleep()`, `model.addAttribute()` 같은 unsupported
+  noise는 출력되지 않는다.
+
+남은 후속 작업:
+
+- Spring Data JPA inherited repository method 표시 정책 구현
+- marker type 구조화 여부 재검토
+- Swing UI의 결과 파일 열기 버튼 같은 사용성 개선
 
 ## 향후 개발 4차 후보
 

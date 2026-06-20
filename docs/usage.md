@@ -149,6 +149,25 @@ circular: UserService.process()
 unsupported: max call depth exceeded
 ```
 
+Controller 메서드 안의 화면 구성용 호출이나 플랫폼 호출처럼 흐름 파악에
+도움이 적은 unsupported 호출은 결과에서 숨길 수 있습니다.
+
+예:
+
+```text
+Thread.sleep()
+model.addAttribute()
+```
+
+Service나 Repository 내부의 unsupported 호출은 계속 표시합니다. 예를 들어
+외부 client 호출은 분석 범위 밖이지만, 기능 흐름을 이해하는 데 중요할 수
+있기 때문입니다.
+
+Spring Data JPA의 `findAll()`, `save()` 같은 상속 repository method는
+소스에 직접 선언되지 않을 수 있습니다. 현재 버전에서는 이런 호출이
+`unresolved`로 보일 수 있으며, 다음 구현에서는 `UserRepository.findAll()`처럼
+repository 호출 흐름으로 표시하는 정책을 적용할 예정입니다.
+
 ## 8. 오류 처리
 
 입력 오류는 exit code `1`을 반환합니다.
@@ -191,6 +210,10 @@ cat build/simple-result.txt
 ```bash
 ./gradlew test
 ```
+
+개발 3차 이후 CLI와 GUI는 같은 `AnalysisRunner` 실행 경로를 사용합니다.
+따라서 CLI fixture 실행이 통과하면 GUI의 분석 및 결과 파일 저장 경로도 같은
+핵심 로직으로 보호됩니다.
 
 ## 10. IDE에서 demo 파일 오류가 보일 때
 
