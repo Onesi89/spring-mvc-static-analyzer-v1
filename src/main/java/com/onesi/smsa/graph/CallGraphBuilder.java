@@ -2,8 +2,8 @@ package com.onesi.smsa.graph;
 
 import com.onesi.smsa.extract.ExtractedCall;
 import com.onesi.smsa.extract.MethodCallExtractor;
+import com.onesi.smsa.graph.policy.CallResolutionPolicy;
 import com.onesi.smsa.model.ClassInfo;
-import com.onesi.smsa.model.Layer;
 import com.onesi.smsa.model.MethodInfo;
 import com.onesi.smsa.model.MethodRef;
 import java.util.ArrayList;
@@ -15,9 +15,15 @@ import java.util.stream.Collectors;
 
 public class CallGraphBuilder {
     private final MethodCallExtractor methodCallExtractor;
+    private final CallResolutionPolicy policy;
 
     public CallGraphBuilder(MethodCallExtractor methodCallExtractor) {
+        this(methodCallExtractor, new CallResolutionPolicy());
+    }
+
+    public CallGraphBuilder(MethodCallExtractor methodCallExtractor, CallResolutionPolicy policy) {
         this.methodCallExtractor = methodCallExtractor;
+        this.policy = policy;
     }
 
     public CallGraph build(List<ClassInfo> classes, Map<String, Map<String, String>> injections) {
@@ -37,9 +43,7 @@ public class CallGraphBuilder {
                 List<CallEdge> outgoing = new ArrayList<>();
                 for (ExtractedCall call : methodCallExtractor.extract(method.declaration())) {
                     CallEdge edge = resolveCall(owner, ownerMethodNames, injections, bySimpleName, call);
-                    if (owner.layer() == Layer.CONTROLLER
-                            && !edge.resolved()
-                            && edge.markerText().startsWith("unsupported: ")) {
+                    if (policy.shouldSuppress(owner, edge)) {
                         continue;
                     }
                     outgoing.add(edge);
