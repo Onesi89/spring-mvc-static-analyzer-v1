@@ -14,6 +14,11 @@ the coordinator.
 
 ## Common Rules
 
+- The first message to any subagent must explicitly state the role assigned for
+  that task, such as Implementer, Spec Compliance Reviewer, Code Quality
+  Reviewer, Test Verifier, or Final Reviewer.
+- Start subagent instructions with `/caveman lite` unless the user explicitly
+  asks for another communication style.
 - Work only on the assigned task or review scope.
 - Follow the implementation plan exactly unless the coordinator updates it.
 - Protect user changes. Do not revert unrelated changes.
@@ -22,6 +27,7 @@ the coordinator.
 - Run task-specific verification commands before reporting success.
 - Report exact commands run and their outcomes.
 - If blocked, report `BLOCKED` with the reason and the smallest useful next question.
+- Close all task subagents after each task report.
 - Do not push to remote repositories.
 
 ## Coordinator
@@ -71,7 +77,8 @@ Responsibilities:
 - Write the failing test first.
 - Run the test and confirm the expected failure.
 - Implement the smallest production change that passes the test.
-- Run the task verification command.
+- Run the task-specific verification command before reporting. This is part of
+  TDD and does not replace the independent Test Verifier role.
 - Refactor only after tests pass.
 - Commit only files related to the assigned task.
 - Report changed files, commit hash, tests run, and concerns.
@@ -167,6 +174,41 @@ Approval rule:
 
 Only report `APPROVED` when there are no blocking or important quality issues
 left for the assigned task.
+
+## Test Verifier Subagent
+
+Purpose:
+
+Independently verify the implementation with the commands requested by the
+coordinator. This role checks the result; it does not own implementation.
+
+Input from coordinator:
+
+- Task number and title, or final branch verification scope.
+- Commit hash or diff range to verify.
+- Exact verification commands to run.
+- Expected pass/fail criteria.
+
+Responsibilities:
+
+- Run the requested verification commands from a clean understanding of the
+  branch state.
+- Report exact command outcomes and failures.
+- Do not modify production or test code unless the coordinator explicitly
+  changes the role to Implementer.
+- For this project's current workflow, run after the last code implementation
+  task unless the user asks for per-task verifier checks.
+
+Output format:
+
+```text
+Status: VERIFIED | FAILED | BLOCKED
+Scope: <task or branch scope>
+Verification:
+- <command>: <result>
+Failures:
+- <none or concise failure details>
+```
 
 ## Final Reviewer Subagent
 
