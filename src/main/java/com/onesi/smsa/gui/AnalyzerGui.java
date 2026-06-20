@@ -1,20 +1,19 @@
 package com.onesi.smsa.gui;
 
-import com.onesi.smsa.core.AnalysisResult;
-import com.onesi.smsa.core.AnalysisWarning;
-import com.onesi.smsa.core.Analyzer;
-import com.onesi.smsa.report.TextReportWriter;
+import com.onesi.smsa.app.AnalysisExecutionResult;
+import com.onesi.smsa.app.AnalysisRequest;
+import com.onesi.smsa.app.AnalysisRunner;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -161,34 +160,28 @@ public class AnalyzerGui {
         appendLog("Target project: " + targetPath);
         appendLog("Result file: " + outputPath);
 
-        new SwingWorker<Integer, String>() {
+        new SwingWorker<AnalysisExecutionResult, String>() {
             @Override
-            protected Integer doInBackground() {
+            protected AnalysisExecutionResult doInBackground() {
                 try {
-                    AnalysisResult result = new Analyzer().analyze(targetPath);
-                    if (result.roots().isEmpty()) {
-                        publish("No Controller entry points found.");
-                    }
-                    for (AnalysisWarning warning : result.warnings()) {
+                    AnalysisExecutionResult result =
+                            new AnalysisRunner().run(new AnalysisRequest(targetPath, outputPath));
+                    for (var warning : result.warnings()) {
                         publish("WARN " + warning.format().replace("\n", " "));
                     }
-                    boolean inputError = result.warnings().stream()
-                            .anyMatch(warning -> warning.code().equals("input-error"));
-                    if (inputError) {
+                    if (result.reportWritten()) {
+                        publish("Analysis completed.");
+                        publish("Report written: " + result.outputPath());
+                    } else if (result.exitCode() == 1) {
                         publish("Analysis stopped because the selected input cannot be analyzed.");
-                        return 1;
+                        publish(result.message());
+                    } else {
+                        publish("ERROR " + result.message());
                     }
-                    Path outputParent = outputPath.toAbsolutePath().getParent();
-                    if (outputParent != null) {
-                        Files.createDirectories(outputParent);
-                    }
-                    Files.writeString(outputPath, new TextReportWriter().write(result), StandardCharsets.UTF_8);
-                    publish("Analysis completed.");
-                    publish("Report written: " + outputPath);
-                    return 0;
+                    return result;
                 } catch (Exception ex) {
                     publish("ERROR Analysis failed: " + ex.getMessage());
-                    return 1;
+                    return new AnalysisExecutionResult(2, targetPath, outputPath, false, List.of(), ex.getMessage());
                 }
             }
 
