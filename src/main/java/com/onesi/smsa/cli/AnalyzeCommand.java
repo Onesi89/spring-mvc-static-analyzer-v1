@@ -1,10 +1,8 @@
 package com.onesi.smsa.cli;
 
-import com.onesi.smsa.core.AnalysisResult;
-import com.onesi.smsa.core.Analyzer;
-import com.onesi.smsa.report.TextReportWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import com.onesi.smsa.app.AnalysisExecutionResult;
+import com.onesi.smsa.app.AnalysisRequest;
+import com.onesi.smsa.app.AnalysisRunner;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
@@ -27,22 +25,11 @@ public class AnalyzeCommand implements Callable<Integer> {
                 return 1;
             }
 
-            if (!Files.exists(targetPath) || !Files.isDirectory(targetPath)) {
-                System.err.println("ERROR: Input path must be an existing directory: " + targetPath);
-                return 1;
+            AnalysisExecutionResult result = new AnalysisRunner().run(new AnalysisRequest(targetPath, outputPath));
+            if (result.exitCode() != 0) {
+                System.err.println("ERROR: " + result.message());
             }
-
-            AnalysisResult result = new Analyzer().analyze(targetPath);
-            boolean inputError = result.warnings().stream()
-                    .anyMatch(warning -> warning.code().equals("input-error"));
-            if (inputError) {
-                result.warnings().forEach(warning -> System.err.println("ERROR: " + warning.message()));
-                return 1;
-            }
-
-            String report = new TextReportWriter().write(result);
-            Files.writeString(outputPath, report, StandardCharsets.UTF_8);
-            return 0;
+            return result.exitCode();
         } catch (Exception ex) {
             System.err.println("ERROR: Analysis failed: " + ex.getMessage());
             return 2;
