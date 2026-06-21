@@ -29,21 +29,20 @@ public class TextReportWriter {
     }
 
     private void appendTree(StringBuilder builder, CallTreeNode node, String prefix) {
-        builder.append(prefix).append(node.text()).append(NEW_LINE);
-        for (int i = 0; i < node.children().size(); i++) {
-            CallTreeNode child = node.children().get(i);
-            boolean last = i == node.children().size() - 1;
-            builder.append(prefix).append(last ? "└─ " : "├─ ").append(child.text()).append(NEW_LINE);
-            appendChildren(builder, child, prefix + (last ? "   " : "│  "));
-        }
+        appendNode(builder, node, prefix, "");
     }
 
-    private void appendChildren(StringBuilder builder, CallTreeNode node, String prefix) {
+    private void appendNode(StringBuilder builder, CallTreeNode node, String prefix, String connector) {
+        builder.append(prefix).append(connector).append(node.text()).append(NEW_LINE);
+        String childPrefix = prefix + switch (connector) {
+            case "├─ " -> "│  ";
+            case "└─ " -> "   ";
+            default -> "";
+        };
         for (int i = 0; i < node.children().size(); i++) {
             CallTreeNode child = node.children().get(i);
             boolean last = i == node.children().size() - 1;
-            builder.append(prefix).append(last ? "└─ " : "├─ ").append(child.text()).append(NEW_LINE);
-            appendChildren(builder, child, prefix + (last ? "   " : "│  "));
+            appendNode(builder, child, childPrefix, last ? "└─ " : "├─ ");
         }
     }
 }

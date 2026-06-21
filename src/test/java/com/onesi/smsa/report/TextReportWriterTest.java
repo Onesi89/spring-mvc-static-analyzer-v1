@@ -20,11 +20,23 @@ class TextReportWriterTest {
 
         String report = new TextReportWriter().write(result);
 
-        assertThat(report).contains("UserController.createUser()");
-        assertThat(report).contains("└─ UserService.createUser()");
-        assertThat(report).contains("   └─ UserRepository.save()");
-        assertThat(report).contains("Warnings");
-        assertThat(report).contains("[parse-error] Broken.java");
+        assertThat(report).isEqualTo("""
+                ==================================================
+                UserController.createUser()
+                ==================================================
+
+                UserController.createUser()
+                └─ UserService.createUser()
+                   └─ UserRepository.save()
+
+                ==================================================
+                Warnings
+                ==================================================
+
+                [parse-error] Broken.java
+                  Could not parse Java source.
+
+                """);
     }
 
     @Test
