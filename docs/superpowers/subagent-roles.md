@@ -4,9 +4,9 @@ This document defines the subagent roles for executing
 `docs/superpowers/plans/2026-06-16-mvp-implementation.md` with the
 Subagent-Driven Development workflow.
 
-The coordinator is the main agent in the current session. The coordinator reads
-the implementation plan, dispatches fresh subagents, reviews their reports, and
-decides whether to continue, request fixes, or escalate.
+The coordinator is the main agent in the current session. The coordinator's
+only role is to send commands to subagents, receive reports, and report to the
+user.
 
 Subagents must not rely on hidden session history. Each subagent receives the
 specific task text, relevant files, expected commands, and success criteria from
@@ -36,13 +36,15 @@ Purpose:
 
 Own the full workflow and context. The coordinator delegates code verification,
 diff review, tests, documentation changes, and review passes to subagents, then
-reviews their reports before moving forward.
+reviews their reports before reporting to the user.
 
 Responsibilities:
 
 - Read the implementation plan before execution.
 - Track task progress.
-- Dispatch one implementer subagent per task.
+- At the start of each task, calculate the minimum necessary subagents and
+  optimize the subagent count.
+- Dispatch only the subagents needed for the task.
 - Delegate code verification, diff review, Ponytail review, and test verification
   to the appropriate subagents instead of repeating that work directly.
 - Delegate documentation creation, modification, and edits to subagents.
@@ -51,10 +53,10 @@ Responsibilities:
 - Dispatch a spec compliance reviewer after each implementation.
 - Dispatch a code quality reviewer only after spec compliance passes.
 - Send review findings back to the implementer until both reviews pass.
-- Read subagent reports and decide whether to continue, request fixes, or
-  dispatch additional reviewers/verifiers.
+- Read subagent reports and dispatch additional reviewers/verifiers only when
+  needed.
 - Use only minimal direct git state checks needed for coordination.
-- After final review approval, run the Compound Knowledge Capture step to
+- After final review approval, delegate the Compound Knowledge Capture step to
   preserve mistakes, lessons, and prevention rules from the execution cycle.
 - Keep commits focused and in plan order.
 
@@ -281,7 +283,8 @@ Coordinator responsibilities:
 - Include review findings that required fixes, not just final successful state.
 - Include failed commands and their root causes when they changed the process.
 - Prefer prevention rules that can guide future tasks.
-- Verify the generated `docs/solutions/` document, if one is created.
+- Review the documentation subagent's verification report for any generated
+  `docs/solutions/` document.
 - Commit the generated learning document separately from feature code.
 
 If `ce-compound` cannot run in the current Codex session because newly installed
@@ -311,7 +314,7 @@ Each implementation task uses this loop:
 3. Implementer Subagent fixes any spec gaps.
 4. Code Quality Reviewer checks maintainability and risk.
 5. Implementer Subagent fixes any quality issues.
-6. Coordinator verifies and marks the task complete.
+6. Coordinator reads subagent reports and reports task status to the user.
 
 After every task passes and the final reviewer approves the whole branch:
 

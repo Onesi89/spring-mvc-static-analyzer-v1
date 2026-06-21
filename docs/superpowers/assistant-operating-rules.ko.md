@@ -38,16 +38,18 @@ Task: <task 이름>
 
 Coordinator 규칙:
 
+- main assistant/coordinator 역할은 subagent에게 지시를 보내고, 보고를 받고, 사용자에게 보고하는 것뿐이다.
+- 각 task 시작 시 필요한 최소 subagent 수를 계산하고 subagent 수를 최적화한다.
 - 코드 검정, diff review, Ponytail review, test verification, 문서 변경은 직접 반복하지 않고 subagent에게 지시한다.
-- Coordinator는 subagent 보고를 읽고 다음 단계, 수정 요청, 승인 여부를 결정한다.
+- Coordinator는 subagent 보고를 읽는다.
 - 필요하면 reviewer/test verifier subagent를 추가로 호출한다.
 - 문서 생성, 수정, 변경은 subagent에게 맡긴다.
 - 긴급 조율 메모나 사용자의 명시 지시가 없으면 Coordinator는 문서를 직접 편집하지 않는다.
-- Coordinator가 직접 하는 일은 작업 지시, 보고 검토, 다음 단계 결정, 사용자 보고, 최소 git 상태 확인으로 제한한다.
+- Coordinator가 직접 하는 일은 작업 지시, 보고 검토, 사용자 보고, 최소 git 상태 확인으로 제한한다.
 
 ## 4. Compound
 
-리뷰/검증/실패에서 배운 내용은 마지막 단계에 compound 문서로 남긴다.
+리뷰/검증/실패에서 배운 내용은 마지막 단계에 subagent에게 맡겨 compound 문서로 남긴다.
 
 대상:
 
@@ -63,7 +65,7 @@ Coordinator 규칙:
 - test/build: `docs/solutions/test-failures/`, `docs/solutions/build-errors/`
 - architecture: `docs/solutions/architecture-patterns/`
 
-compound 문서는 frontmatter validator를 실행한다.
+compound frontmatter 검증은 subagent에게 맡긴다.
 
 ## 5. Task 완료 후 Main Merge
 

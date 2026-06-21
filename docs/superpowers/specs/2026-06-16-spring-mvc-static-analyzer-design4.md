@@ -148,6 +148,10 @@ change commands, paths, or expected behavior.
   small batch.
 - After the last code implementation task, run spec compliance review, code quality
   review, and independent test verification.
+- The coordinator's only role is to send commands to subagents, receive reports,
+  and report to the user.
+- At the start of each task, calculate the minimum necessary subagents and
+  optimize the subagent count.
 - The coordinator delegates code checks, diff review, Ponytail review, test
   verification, and documentation changes to subagents, then reads their reports.
 - Documentation creation, modification, and edits are subagent work.

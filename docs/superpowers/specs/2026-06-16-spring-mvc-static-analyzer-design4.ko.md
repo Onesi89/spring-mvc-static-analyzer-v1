@@ -142,6 +142,9 @@ fixture 출력 확인 항목:
   한 번 실행한다.
 - 마지막 code 구현 task 이후에는 spec compliance review, code quality review,
   독립 test verification을 실행한다.
+- Coordinator 역할은 subagent에게 지시를 보내고, 보고를 받고, 사용자에게
+  보고하는 것뿐이다.
+- 각 task 시작 시 필요한 최소 subagent 수를 계산하고 subagent 수를 최적화한다.
 - Coordinator는 코드 검정, diff review, Ponytail review, test verification,
   문서 변경을 subagent에게 맡기고 보고를 읽는다.
 - 문서 생성, 수정, 변경은 subagent 작업이다.

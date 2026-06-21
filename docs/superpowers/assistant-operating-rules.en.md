@@ -38,16 +38,18 @@ Rules:
 
 Coordinator rules:
 
-- Do not personally repeat code verification, diff review, Ponytail review, test verification, or documentation changes when those should be delegated to subagents.
-- Instruct subagents, read their reports, and decide next steps.
+- The main assistant/coordinator role is only to send commands to subagents, receive reports, and report to the user.
+- At the start of each task, calculate the minimum necessary subagents and optimize the subagent count.
+- Do not personally repeat code verification, diff review, Ponytail review, test verification, or documentation changes; delegate them to subagents.
+- Instruct subagents and read their reports.
 - Spawn additional reviewer or verifier subagents when needed.
 - Delegate documentation creation, modification, and edits to subagents.
 - Do not directly edit docs except for emergency coordination notes or when the user explicitly instructs it.
-- Direct coordinator work is limited to task instructions, report review, next-step decisions, user reports, and minimal git state checks.
+- Direct coordinator work is limited to task instructions, report review, user reports, and minimal git state checks.
 
 ## 4. Compound
 
-At the end, write compound docs for lessons from review, verification, or failure.
+At the end, delegate compound docs for lessons from review, verification, or failure.
 
 Capture:
 
@@ -63,7 +65,7 @@ Locations:
 - test/build: `docs/solutions/test-failures/`, `docs/solutions/build-errors/`
 - architecture: `docs/solutions/architecture-patterns/`
 
-Validate compound frontmatter.
+Delegate compound frontmatter validation to a subagent.
 
 ## 5. After All Tasks: Merge To Main
 
