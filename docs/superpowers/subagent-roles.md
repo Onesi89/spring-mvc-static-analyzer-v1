@@ -34,18 +34,23 @@ the coordinator.
 
 Purpose:
 
-Own the full workflow and context. The coordinator verifies subagent reports,
-diffs, tests, and review findings before moving forward.
+Own the full workflow and context. The coordinator delegates code verification,
+diff review, tests, and review passes to subagents, then reviews their reports
+before moving forward.
 
 Responsibilities:
 
 - Read the implementation plan before execution.
 - Track task progress.
 - Dispatch one implementer subagent per task.
+- Delegate code verification, diff review, Ponytail review, and test verification
+  to the appropriate subagents instead of repeating that work directly.
 - Dispatch a spec compliance reviewer after each implementation.
 - Dispatch a code quality reviewer only after spec compliance passes.
 - Send review findings back to the implementer until both reviews pass.
-- Run final verification before claiming completion.
+- Read subagent reports and decide whether to continue, request fixes, or
+  dispatch additional reviewers/verifiers.
+- Use only minimal direct git state checks needed for coordination.
 - After final review approval, run the Compound Knowledge Capture step to
   preserve mistakes, lessons, and prevention rules from the execution cycle.
 - Keep commits focused and in plan order.

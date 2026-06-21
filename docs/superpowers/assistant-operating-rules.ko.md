@@ -36,6 +36,13 @@ Task: <task 이름>
 - task가 끝나면 관련 subagent를 모두 종료한다.
 - subagent는 push하지 않는다.
 
+Coordinator 규칙:
+
+- 코드 검정, diff review, Ponytail review, test verification은 직접 반복하지 않고 subagent에게 지시한다.
+- Coordinator는 subagent 보고를 읽고 다음 단계, 수정 요청, 승인 여부를 결정한다.
+- 필요하면 reviewer/test verifier subagent를 추가로 호출한다.
+- Coordinator가 직접 하는 일은 작업 지시, 보고 검토, 문서 편집, 최소 git 상태 확인으로 제한한다.
+
 ## 4. Compound
 
 리뷰/검증/실패에서 배운 내용은 마지막 단계에 compound 문서로 남긴다.

@@ -36,6 +36,13 @@ Rules:
 - Close all task subagents after the task report.
 - Subagents must not push.
 
+Coordinator rules:
+
+- Do not personally repeat code verification, diff review, Ponytail review, or test verification when those should be delegated to subagents.
+- Instruct subagents, read their reports, and decide next steps.
+- Spawn additional reviewer or verifier subagents when needed.
+- Direct coordinator work is limited to task instructions, report review, document edits, and minimal git state checks.
+
 ## 4. Compound
 
 At the end, write compound docs for lessons from review, verification, or failure.
