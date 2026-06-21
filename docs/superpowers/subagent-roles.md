@@ -16,7 +16,8 @@ the coordinator.
 
 - Only the first message to any subagent must explicitly state the role assigned
   for that task, such as Implementer, Spec Compliance Reviewer, Code Quality
-  Reviewer, Test Verifier, or Final Reviewer.
+  Reviewer, Combined Spec/Quality Reviewer, Documentation Implementer, Test
+  Verifier, or Final Reviewer.
 - Only the first message to any subagent must start with `/caveman lite` unless
   the user explicitly asks for another communication style.
 - Work only on the assigned task or review scope.
@@ -34,9 +35,9 @@ the coordinator.
 
 Purpose:
 
-Own the full workflow and context. The coordinator delegates code verification,
-diff review, tests, documentation changes, and review passes to subagents, then
-reviews their reports before reporting to the user.
+Route the workflow. The coordinator sends commands to subagents, receives
+reports, and reports to the user. Normal-flow code, docs, diffs, tests, reviews,
+and commits belong to subagents.
 
 Responsibilities:
 
@@ -44,21 +45,27 @@ Responsibilities:
 - Track task progress.
 - At the start of each task, calculate the minimum necessary subagents and
   optimize the subagent count.
-- Dispatch only the subagents needed for the task.
+- Do not dispatch subagents by default unless the task needs one, except
+  documentation creation, modification, or deletion, which always uses at least
+  one documentation subagent.
+- Dispatch subagents only for code implementation, documentation work,
+  independent verification, explicit review gates, compound docs, or explicit
+  user request.
+- Avoid duplicate agents with the same purpose.
+- If a subagent already owns the task, ask that subagent for fixes before
+  spawning another.
 - Delegate code verification, diff review, Ponytail review, and test verification
   to the appropriate subagents instead of repeating that work directly.
 - Delegate documentation creation, modification, and edits to subagents.
-- Do not directly edit docs except for emergency coordination notes or when the
-  user explicitly instructs it.
-- Dispatch a spec compliance reviewer after each implementation.
-- Dispatch a code quality reviewer only after spec compliance passes.
-- Send review findings back to the implementer until both reviews pass.
+- Do not directly edit docs.
+- Send review findings back to the responsible implementer until required
+  review gates pass.
 - Read subagent reports and dispatch additional reviewers/verifiers only when
-  needed.
+  a report shows concrete unresolved risk.
 - Use only minimal direct git state checks needed for coordination.
 - After final review approval, delegate the Compound Knowledge Capture step to
   preserve mistakes, lessons, and prevention rules from the execution cycle.
-- Keep commits focused and in plan order.
+- Ask the responsible subagent to keep commits focused and in plan order.
 
 Status handling:
 
@@ -104,6 +111,42 @@ Verification:
 - <command>: <result>
 Commit:
 - <sha> <message>
+Concerns:
+- <none or concise notes>
+```
+
+## Documentation Implementer Subagent
+
+Purpose:
+
+Create, modify, verify, and commit documentation. Documentation-only work uses
+this role even for trivial typo or path wording changes.
+
+Input from coordinator:
+
+- Documentation task and scope.
+- Relevant source files and target docs.
+- Required verification commands.
+- Expected commit message, if a commit is requested.
+
+Responsibilities:
+
+- Edit only assigned documentation files.
+- Keep wording concise and consistent with nearby docs.
+- Run requested documentation verification.
+- Commit the documentation change when requested.
+- Report changed files, verification, commit hash, and concerns.
+
+Output format:
+
+```text
+Status: DONE | BLOCKED
+Files:
+- <path>
+Verification:
+- <command>: <result>
+Commit:
+- <sha> <message, or none>
 Concerns:
 - <none or concise notes>
 ```
@@ -184,6 +227,38 @@ Approval rule:
 
 Only report `APPROVED` when there are no blocking or important quality issues
 left for the assigned task.
+
+## Combined Spec/Quality Reviewer Subagent
+
+Purpose:
+
+Use one reviewer when the minimum matrix calls for both spec and quality checks
+but the diff does not justify separate reviewers.
+
+Input from coordinator:
+
+- Task title and scope.
+- Relevant spec sections.
+- Commit hash or diff range to review.
+
+Responsibilities:
+
+- Check required behavior against the spec.
+- Check maintainability, local design, tests, and risk.
+- Keep findings prioritized and scoped.
+
+Output format:
+
+```text
+Status: APPROVED | CHANGES_REQUESTED
+Task: <task title>
+Findings:
+- <severity>: <file:line if available> <issue>
+Spec coverage:
+- <brief checklist summary>
+Residual risk:
+- <none or concise note>
+```
 
 ## Test Verifier Subagent
 
@@ -285,7 +360,8 @@ Coordinator responsibilities:
 - Prefer prevention rules that can guide future tasks.
 - Review the documentation subagent's verification report for any generated
   `docs/solutions/` document.
-- Commit the generated learning document separately from feature code.
+- Ask the documentation subagent to commit the generated learning document
+  separately from feature code.
 
 If `ce-compound` cannot run in the current Codex session because newly installed
 skills require a restart, record the intended invocation and run it immediately
@@ -305,9 +381,26 @@ Commit:
 - <sha> <message, or none>
 ```
 
+## Minimum Subagent Matrix
+
+- Default: do not spawn subagents unless needed.
+- Documentation creation, modification, or deletion: always one Documentation
+  Implementer, even for trivial typo or path wording changes.
+- Small code diff: one Implementer; final branch Test Verifier only unless risk
+  requires more.
+- Report output, CLI, GUI, or analyzer policy change: Implementer, combined
+  Spec/Quality Reviewer, and Test Verifier.
+- Multi-file behavior or protected boundary: one Implementer per bounded task,
+  needed reviewers, and final Test Verifier.
+- Branch completion: Final Reviewer and Test Verifier.
+- Compound: one Documentation Implementer only when a reusable lesson exists.
+- Additional reviewer or verifier: only when a report shows concrete unresolved
+  risk.
+- Existing task subagent: ask that subagent for fixes before spawning another.
+
 ## Task-to-Role Mapping
 
-Each implementation task uses this loop:
+Use the minimum matrix first. When a task requires the full review loop:
 
 1. Implementer Subagent executes the task.
 2. Spec Compliance Reviewer checks the task against the plan.
@@ -320,7 +413,7 @@ After every task passes and the final reviewer approves the whole branch:
 
 1. Coordinator delegates Compound Knowledge Capture to a documentation subagent.
 2. Coordinator reviews the generated learning document report for accuracy.
-3. Coordinator commits the learning document.
+3. Documentation subagent commits the learning document.
 4. Coordinator reports the final implementation status.
 
 Task complexity guidance:

@@ -140,16 +140,29 @@ fixture 출력 확인 항목:
 - 구현 전 Ponytail audit를 실행한다.
 - 의미 있는 code diff마다 Ponytail review를 실행하거나, 작은 묶음이면 마지막에
   한 번 실행한다.
-- 마지막 code 구현 task 이후에는 spec compliance review, code quality review,
-  독립 test verification을 실행한다.
 - Coordinator 역할은 subagent에게 지시를 보내고, 보고를 받고, 사용자에게
   보고하는 것뿐이다.
 - 각 task 시작 시 필요한 최소 subagent 수를 계산하고 subagent 수를 최적화한다.
 - Coordinator는 코드 검정, diff review, Ponytail review, test verification,
   문서 변경을 subagent에게 맡기고 보고를 읽는다.
 - 문서 생성, 수정, 변경은 subagent 작업이다.
-- 긴급 조율 메모나 사용자 명시 지시가 없으면 Coordinator는 문서를 직접 편집하지 않는다.
+- Coordinator는 문서를 직접 편집하지 않는다.
 - Coordinator가 직접 하는 검사는 조율에 필요한 최소 git 상태 확인으로 제한한다.
+- 기본적으로 필요한 경우가 아니면 subagent를 만들지 않는다. 단, 문서 작업은
+  항상 최소 1명의 documentation subagent가 맡는다.
+- subagent는 코드 구현, 문서 작업, 독립 검증, 명시된 review gate, compound
+  문서, 사용자 요청에만 만든다.
+- 같은 목적의 중복 agent를 만들지 않는다.
+- 이미 해당 task를 맡은 subagent가 있으면 다른 agent를 만들기 전에 그
+  subagent에게 수정을 요청한다.
+- 추가 reviewer/verifier는 보고서에 구체적인 미해결 위험이 있을 때만 만든다.
+- 최소 matrix:
+  - 사소한 문서 typo/path wording: documentation subagent 1명.
+  - 작은 code diff: Implementer 1명; risk가 없으면 최종 branch Test Verifier만 추가.
+  - report output, CLI, GUI, analyzer policy 변경: Implementer + Combined Spec/Quality Reviewer + Test Verifier.
+  - 여러 파일 behavior 또는 보호된 boundary: bounded task마다 Implementer 1명 + 필요한 reviewer + 최종 Test Verifier.
+  - branch 완료: Final Reviewer + Test Verifier.
+  - Compound: 재사용 가능한 교훈이 있을 때만 documentation subagent 1명.
 - Subagent는 push하지 않는다.
 - 사용자가 요청하지 않으면 `main` merge 단계로 가지 않는다.
 

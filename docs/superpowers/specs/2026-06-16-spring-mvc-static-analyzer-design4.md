@@ -146,8 +146,6 @@ change commands, paths, or expected behavior.
 - Use Ponytail audit before implementation work.
 - Use Ponytail review after each meaningful code diff, or at final review for a
   small batch.
-- After the last code implementation task, run spec compliance review, code quality
-  review, and independent test verification.
 - The coordinator's only role is to send commands to subagents, receive reports,
   and report to the user.
 - At the start of each task, calculate the minimum necessary subagents and
@@ -155,9 +153,24 @@ change commands, paths, or expected behavior.
 - The coordinator delegates code checks, diff review, Ponytail review, test
   verification, and documentation changes to subagents, then reads their reports.
 - Documentation creation, modification, and edits are subagent work.
-- The coordinator does not directly edit docs except for emergency coordination
-  notes or explicit user instruction.
+- The coordinator does not directly edit docs.
 - The coordinator may perform only minimal git state checks needed to coordinate.
+- Do not spawn subagents by default unless needed, except documentation work,
+  which always uses at least one documentation subagent.
+- Spawn subagents only for code implementation, documentation work, independent
+  verification, explicit review gates, compound docs, or explicit user request.
+- Avoid duplicate agents with the same purpose.
+- If a subagent already owns the task, ask that subagent for fixes before
+  spawning another.
+- Spawn additional reviewers/verifiers only when a report shows concrete
+  unresolved risk.
+- Minimum matrix:
+  - Trivial doc typo/path wording: one documentation subagent.
+  - Small code diff: one Implementer; final branch Test Verifier only unless risk requires more.
+  - Report output, CLI, GUI, or analyzer policy change: Implementer, combined Spec/Quality Reviewer, and Test Verifier.
+  - Multi-file behavior or protected boundary: one Implementer per bounded task, needed reviewers, and final Test Verifier.
+  - Branch completion: Final Reviewer and Test Verifier.
+  - Compound: one documentation subagent only when a reusable lesson exists.
 - Subagents must not push.
 - Do not merge to `main` unless the user asks for the main-merge phase.
 

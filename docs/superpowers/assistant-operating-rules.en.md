@@ -22,7 +22,7 @@ Only the first message to any subagent must start with:
 
 ```text
 /caveman lite
-Role: <Implementer | Spec Compliance Reviewer | Code Quality Reviewer | Test Verifier | Final Reviewer>
+Role: <Implementer | Documentation Implementer | Spec Compliance Reviewer | Code Quality Reviewer | Combined Spec/Quality Reviewer | Test Verifier | Final Reviewer>
 Task: <task name>
 ```
 
@@ -32,7 +32,6 @@ Rules:
 - Provide task text, relevant files, success criteria, and verification commands.
 - Implementer runs task-specific tests because TDD requires it.
 - Test Verifier is an independent verification gate.
-- After the last code implementation task, run Spec Reviewer, Code Quality Reviewer, and Test Verifier.
 - Close all task subagents after the task report.
 - Subagents must not push.
 
@@ -42,10 +41,23 @@ Coordinator rules:
 - At the start of each task, calculate the minimum necessary subagents and optimize the subagent count.
 - Do not personally repeat code verification, diff review, Ponytail review, test verification, or documentation changes; delegate them to subagents.
 - Instruct subagents and read their reports.
-- Spawn additional reviewer or verifier subagents when needed.
+- Do not spawn subagents by default unless needed, except documentation creation, modification, or deletion, which always uses at least one documentation subagent.
+- Spawn subagents only for code implementation, documentation work, independent verification, explicit review gates, compound docs, or explicit user request.
+- Avoid duplicate agents with the same purpose.
+- If a subagent already owns the task, ask that subagent for fixes before spawning another.
+- Spawn additional reviewer or verifier subagents only when a report shows concrete unresolved risk.
 - Delegate documentation creation, modification, and edits to subagents.
-- Do not directly edit docs except for emergency coordination notes or when the user explicitly instructs it.
+- Do not directly edit docs.
 - Direct coordinator work is limited to task instructions, report review, user reports, and minimal git state checks.
+
+Minimum subagent matrix:
+
+- Trivial doc typo/path wording: one documentation subagent.
+- Small code diff: one Implementer; final branch Test Verifier only unless risk requires more.
+- Report output, CLI, GUI, or analyzer policy change: Implementer, combined Spec/Quality Reviewer, and Test Verifier.
+- Multi-file behavior or protected boundary: one Implementer per bounded task, needed reviewers, and final Test Verifier.
+- Branch completion: Final Reviewer and Test Verifier.
+- Compound: one documentation subagent only when a reusable lesson exists.
 
 ## 4. Compound
 
