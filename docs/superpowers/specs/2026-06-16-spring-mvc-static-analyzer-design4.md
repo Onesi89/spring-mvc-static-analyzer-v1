@@ -148,8 +148,11 @@ change commands, paths, or expected behavior.
   small batch.
 - After the last code implementation task, run spec compliance review, code quality
   review, and independent test verification.
-- The coordinator delegates code checks, diff review, Ponytail review, and test
-  verification to subagents, then reads their reports.
+- The coordinator delegates code checks, diff review, Ponytail review, test
+  verification, and documentation changes to subagents, then reads their reports.
+- Documentation creation, modification, and edits are subagent work.
+- The coordinator does not directly edit docs except for emergency coordination
+  notes or explicit user instruction.
 - The coordinator may perform only minimal git state checks needed to coordinate.
 - Subagents must not push.
 - Do not merge to `main` unless the user asks for the main-merge phase.

@@ -142,8 +142,10 @@ fixture 출력 확인 항목:
   한 번 실행한다.
 - 마지막 code 구현 task 이후에는 spec compliance review, code quality review,
   독립 test verification을 실행한다.
-- Coordinator는 코드 검정, diff review, Ponytail review, test verification을
-  subagent에게 맡기고 보고를 읽는다.
+- Coordinator는 코드 검정, diff review, Ponytail review, test verification,
+  문서 변경을 subagent에게 맡기고 보고를 읽는다.
+- 문서 생성, 수정, 변경은 subagent 작업이다.
+- 긴급 조율 메모나 사용자 명시 지시가 없으면 Coordinator는 문서를 직접 편집하지 않는다.
 - Coordinator가 직접 하는 검사는 조율에 필요한 최소 git 상태 확인으로 제한한다.
 - Subagent는 push하지 않는다.
 - 사용자가 요청하지 않으면 `main` merge 단계로 가지 않는다.

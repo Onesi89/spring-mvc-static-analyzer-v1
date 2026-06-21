@@ -38,10 +38,12 @@ Task: <task 이름>
 
 Coordinator 규칙:
 
-- 코드 검정, diff review, Ponytail review, test verification은 직접 반복하지 않고 subagent에게 지시한다.
+- 코드 검정, diff review, Ponytail review, test verification, 문서 변경은 직접 반복하지 않고 subagent에게 지시한다.
 - Coordinator는 subagent 보고를 읽고 다음 단계, 수정 요청, 승인 여부를 결정한다.
 - 필요하면 reviewer/test verifier subagent를 추가로 호출한다.
-- Coordinator가 직접 하는 일은 작업 지시, 보고 검토, 문서 편집, 최소 git 상태 확인으로 제한한다.
+- 문서 생성, 수정, 변경은 subagent에게 맡긴다.
+- 긴급 조율 메모나 사용자의 명시 지시가 없으면 Coordinator는 문서를 직접 편집하지 않는다.
+- Coordinator가 직접 하는 일은 작업 지시, 보고 검토, 다음 단계 결정, 사용자 보고, 최소 git 상태 확인으로 제한한다.
 
 ## 4. Compound
 

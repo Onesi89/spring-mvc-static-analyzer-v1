@@ -35,8 +35,8 @@ the coordinator.
 Purpose:
 
 Own the full workflow and context. The coordinator delegates code verification,
-diff review, tests, and review passes to subagents, then reviews their reports
-before moving forward.
+diff review, tests, documentation changes, and review passes to subagents, then
+reviews their reports before moving forward.
 
 Responsibilities:
 
@@ -45,6 +45,9 @@ Responsibilities:
 - Dispatch one implementer subagent per task.
 - Delegate code verification, diff review, Ponytail review, and test verification
   to the appropriate subagents instead of repeating that work directly.
+- Delegate documentation creation, modification, and edits to subagents.
+- Do not directly edit docs except for emergency coordination notes or when the
+  user explicitly instructs it.
 - Dispatch a spec compliance reviewer after each implementation.
 - Dispatch a code quality reviewer only after spec compliance passes.
 - Send review findings back to the implementer until both reviews pass.
@@ -312,8 +315,8 @@ Each implementation task uses this loop:
 
 After every task passes and the final reviewer approves the whole branch:
 
-1. Coordinator runs Compound Knowledge Capture.
-2. Coordinator reviews the generated learning document for accuracy.
+1. Coordinator delegates Compound Knowledge Capture to a documentation subagent.
+2. Coordinator reviews the generated learning document report for accuracy.
 3. Coordinator commits the learning document.
 4. Coordinator reports the final implementation status.
 
@@ -323,8 +326,8 @@ Task complexity guidance:
 - Tasks 5-10: more capable implementer recommended because parsing, graph construction, CLI behavior, and integration tests involve multi-file coordination.
 - Task 11: standard implementer and reviewers.
 - Final review: most capable reviewer available.
-- Compound Knowledge Capture: coordinator-owned, using `ce-compound` in
-  `mode:headless`.
+- Compound Knowledge Capture: delegated to a documentation subagent using
+  `ce-compound` in `mode:headless`.
 
 ## Non-Goals
 

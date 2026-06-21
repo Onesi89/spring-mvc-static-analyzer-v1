@@ -38,10 +38,12 @@ Rules:
 
 Coordinator rules:
 
-- Do not personally repeat code verification, diff review, Ponytail review, or test verification when those should be delegated to subagents.
+- Do not personally repeat code verification, diff review, Ponytail review, test verification, or documentation changes when those should be delegated to subagents.
 - Instruct subagents, read their reports, and decide next steps.
 - Spawn additional reviewer or verifier subagents when needed.
-- Direct coordinator work is limited to task instructions, report review, document edits, and minimal git state checks.
+- Delegate documentation creation, modification, and edits to subagents.
+- Do not directly edit docs except for emergency coordination notes or when the user explicitly instructs it.
+- Direct coordinator work is limited to task instructions, report review, next-step decisions, user reports, and minimal git state checks.
 
 ## 4. Compound
 
