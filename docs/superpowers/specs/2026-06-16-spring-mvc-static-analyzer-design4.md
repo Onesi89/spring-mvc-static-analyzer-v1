@@ -139,7 +139,9 @@ change commands, paths, or expected behavior.
 
 ## Subagent and Review Rules
 
-- Subagents must start with `/caveman lite`.
+- Only the first message to a subagent must start with `/caveman lite`.
+- Only the first message to a subagent must state that subagent's role.
+- Later messages to the same subagent do not repeat `/caveman lite` or the role.
 - Implementer subagents get one bounded task and task-specific tests.
 - Use Ponytail audit before implementation work.
 - Use Ponytail review after each meaningful code diff, or at final review for a

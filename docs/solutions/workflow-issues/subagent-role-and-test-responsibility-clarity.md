@@ -28,8 +28,9 @@ Verifier is an independent quality gate.
 
 ## Guidance
 
-Every first message to a subagent must explicitly state the role assigned for
-that task. Start with the communication style and role before the task details:
+Only the first message to a subagent must explicitly state the role assigned for
+that task. Start that first message with the communication style and role before
+the task details:
 
 ```text
 /caveman lite
@@ -47,6 +48,8 @@ Scope: Final code implementation verification
 
 Keep test responsibility split this way:
 
+- Later messages to the same subagent do not need to repeat `/caveman lite` or
+  the role.
 - The Implementer runs task-specific tests because TDD requires writing or
   selecting a failing test, making it pass, and verifying the local change.
 - The Test Verifier runs independent verification after implementation, using

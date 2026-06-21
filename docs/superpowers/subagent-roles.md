@@ -14,11 +14,11 @@ the coordinator.
 
 ## Common Rules
 
-- The first message to any subagent must explicitly state the role assigned for
-  that task, such as Implementer, Spec Compliance Reviewer, Code Quality
+- Only the first message to any subagent must explicitly state the role assigned
+  for that task, such as Implementer, Spec Compliance Reviewer, Code Quality
   Reviewer, Test Verifier, or Final Reviewer.
-- Start subagent instructions with `/caveman lite` unless the user explicitly
-  asks for another communication style.
+- Only the first message to any subagent must start with `/caveman lite` unless
+  the user explicitly asks for another communication style.
 - Work only on the assigned task or review scope.
 - Follow the implementation plan exactly unless the coordinator updates it.
 - Protect user changes. Do not revert unrelated changes.

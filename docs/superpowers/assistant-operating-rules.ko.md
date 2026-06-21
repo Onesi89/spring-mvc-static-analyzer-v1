@@ -18,7 +18,7 @@ Codex가 규칙을 잊었을 때 이 문서를 먼저 읽는다.
 
 ## 3. Subagent
 
-첫 메시지는 반드시 아래 형식으로 시작한다.
+첫 통신에만 반드시 아래 형식으로 시작한다.
 
 ```text
 /caveman lite
@@ -28,6 +28,7 @@ Task: <task 이름>
 
 규칙:
 
+- 이후 같은 subagent에게 추가 지시할 때는 `/caveman lite`와 역할을 반복하지 않는다.
 - task 내용, 관련 파일, 성공 기준, 검증 명령을 명시한다.
 - 구현 agent는 TDD 때문에 task-specific test를 실행한다.
 - Test Verifier는 독립 검증 담당이다.

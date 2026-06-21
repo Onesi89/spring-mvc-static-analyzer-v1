@@ -18,7 +18,7 @@ Read this first when I may have forgotten the project rules.
 
 ## 3. Subagents
 
-First message to any subagent must start with:
+Only the first message to any subagent must start with:
 
 ```text
 /caveman lite
@@ -28,6 +28,7 @@ Task: <task name>
 
 Rules:
 
+- Do not repeat `/caveman lite` or the role in later messages to the same subagent.
 - Provide task text, relevant files, success criteria, and verification commands.
 - Implementer runs task-specific tests because TDD requires it.
 - Test Verifier is an independent verification gate.

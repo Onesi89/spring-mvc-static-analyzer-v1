@@ -133,7 +133,9 @@ fixture 출력 확인 항목:
 
 ## Subagent / 리뷰 규칙
 
-- Subagent 첫 줄은 `/caveman lite`로 시작한다.
+- Subagent 첫 통신만 `/caveman lite`로 시작한다.
+- Subagent 첫 통신에만 해당 subagent의 역할을 전달한다.
+- 같은 subagent에게 보내는 후속 메시지에는 `/caveman lite`와 역할을 반복하지 않는다.
 - Implementer subagent에는 경계가 작은 task 하나와 task-specific test를 준다.
 - 구현 전 Ponytail audit를 실행한다.
 - 의미 있는 code diff마다 Ponytail review를 실행하거나, 작은 묶음이면 마지막에
