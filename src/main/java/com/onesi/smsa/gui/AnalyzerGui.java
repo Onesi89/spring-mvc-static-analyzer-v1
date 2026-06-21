@@ -9,7 +9,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -150,11 +149,6 @@ public class AnalyzerGui {
             showError("Select both a target project folder and a result file.");
             return;
         }
-        if (!Files.isDirectory(targetPath)) {
-            showError("Target project must be an existing folder: " + targetPath);
-            return;
-        }
-
         setControlsEnabled(false);
         appendLog("Analysis started.");
         appendLog("Target project: " + targetPath);
